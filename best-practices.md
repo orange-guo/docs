@@ -7,30 +7,25 @@ This guide assumes you are already familiar with the concepts and `Resource` API
 In order to encapsulate the functionality, the `Resource` interface is sometimes not implemented directly by the component but we rather create an (anonymous) inner class. However it is not sufficient to pass this resource to the `Context.register()` method; Global Context tracks resources using *weak* references. As there is no `unregister` method on the Context, had a strong reference been used this would prevent the component from being garbage-collected when the application releases it. Therefore the class implementing `Resource` should be stored inside the component (in a field) to prevent garbage-collection:
 
 ```java
-import jdk.crac.*;
-
 public class Component {
-    public static void main(String[] args) {
-        Resource cracHandler = new Resource() {
+    private final Resource cracHandler;
+
+    public Component() {
+        /* other initialization */
+        cracHandler = new Resource() {
             @Override
             public void beforeCheckpoint(Context<? extends Resource> context) {
-                System.out.println("beforeCheckpoint");
+                /* ... */
             }
 
             @Override
             public void afterRestore(Context<? extends Resource> context) {
-                System.out.println("afterRestore");
+                /* ... */
             }
         };
+        /* Had we used just .register(new Resource() { ... }) in here
+           it would be immediately garbage-collected. */
         Core.getGlobalContext().register(cracHandler);
-        while (true) {
-            System.out.println(System.currentTimeMillis());
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
     }
 }
 ```
