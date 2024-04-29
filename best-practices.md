@@ -22,7 +22,7 @@ public class Component {
             public void afterRestore(Context<? extends Resource> context) {
                 /* ... */
             }
-        }
+        };
         /* Had we used just .register(new Resource() { ... }) in here
            it would be immediately garbage-collected. */
         Core.getGlobalContext().register(cracHandler);
